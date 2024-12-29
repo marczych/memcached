@@ -2319,8 +2319,9 @@ enum delta_result_type do_add_delta(LIBEVENT_THREAD *t, const char *key, const s
         t->stats.slab_stats[ITEM_clsid(it)].incr_hits++;
     } else if (command == ARITHMETIC_DECR) {
         t->stats.slab_stats[ITEM_clsid(it)].decr_hits++;
+    } else if (command == ARITHMETIC_MULT) {
+        t->stats.slab_stats[ITEM_clsid(it)].mult_hits++;
     }
-    // TODO: mult stats
     pthread_mutex_unlock(&t->stats.mutex);
 
     itoa_u64(value, buf);

@@ -2173,10 +2173,11 @@ static void process_arithmetic_command(conn *c, token_t *tokens, const size_t nt
         pthread_mutex_lock(&c->thread->stats.mutex);
         if (command == ARITHMETIC_INCR) {
             c->thread->stats.incr_misses++;
-        } else {
+        } else if (command == ARITHMETIC_DECR) {
             c->thread->stats.decr_misses++;
+        } else if (command == ARITHMETIC_MULT) {
+            c->thread->stats.mult_misses++;
         }
-        // TODO: Mult stats
         pthread_mutex_unlock(&c->thread->stats.mutex);
 
         out_string(c, "NOT_FOUND");
