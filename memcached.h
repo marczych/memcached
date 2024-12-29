@@ -294,6 +294,10 @@ enum delta_result_type {
     OK, NON_NUMERIC, EOM, DELTA_ITEM_NOT_FOUND, DELTA_ITEM_CAS_MISMATCH
 };
 
+enum arithmetic_command {
+    ARITHMETIC_INCR, ARITHMETIC_DECR, ARITHMETIC_MULT
+};
+
 /** Time relative to server start. Smaller than time_t on 64-bit systems. */
 // TODO: Move to sub-header. needed in logger.h
 //typedef unsigned int rel_time_t;
@@ -931,7 +935,7 @@ extern void *ext_storage;
 void verify_default(const char* param, bool condition);
 void do_accept_new_conns(const bool do_accept);
 enum delta_result_type do_add_delta(LIBEVENT_THREAD *t, const char *key,
-                                    const size_t nkey, const uint64_t type,
+                                    const size_t nkey, enum arithmetic_command command,
                                     const int64_t delta, char *buf,
                                     uint64_t *cas, const uint32_t hv,
                                     item **it_ret);
@@ -978,7 +982,7 @@ void sidethread_conn_close(conn *c);
 
 /* Lock wrappers for cache functions that are called from main loop. */
 enum delta_result_type add_delta(LIBEVENT_THREAD *t, const char *key,
-                                 const size_t nkey, uint64_t type,
+                                 const size_t nkey, enum arithmetic_command command,
                                  const int64_t delta, char *buf,
                                  uint64_t *cas);
 void accept_new_conns(const bool do_accept);

@@ -2263,7 +2263,7 @@ item* limited_get_locked(const char *key, size_t nkey, LIBEVENT_THREAD *t, bool 
  * returns a response string to send back to the client.
  */
 enum delta_result_type do_add_delta(LIBEVENT_THREAD *t, const char *key, const size_t nkey,
-                                    const uint64_t type, const int64_t delta,
+                                    enum arithmetic_command command, const int64_t delta,
                                     char *buf, uint64_t *cas,
                                     const uint32_t hv,
                                     item **it_ret) {
@@ -2300,24 +2300,24 @@ enum delta_result_type do_add_delta(LIBEVENT_THREAD *t, const char *key, const s
         return NON_NUMERIC;
     }
 
-    if (type == 0) {
+    if (command == ARITHMETIC_INCR) {
         value += delta;
         //MEMCACHED_COMMAND_INCR(c->sfd, ITEM_key(it), it->nkey, value);
-    } else if (type == 1) {
+    } else if (command == ARITHMETIC_DECR) {
         if(delta > value) {
             value = 0;
         } else {
             value -= delta;
         }
         //MEMCACHED_COMMAND_DECR(c->sfd, ITEM_key(it), it->nkey, value);
-    } else if (type == 2) {
+    } else if (command == ARITHMETIC_MULT) {
         value *= delta;
     }
 
     pthread_mutex_lock(&t->stats.mutex);
-    if (type == 0) {
+    if (command == ARITHMETIC_INCR) {
         t->stats.slab_stats[ITEM_clsid(it)].incr_hits++;
-    } else if (type == 1) {
+    } else if (command == ARITHMETIC_DECR) {
         t->stats.slab_stats[ITEM_clsid(it)].decr_hits++;
     }
     // TODO: mult stats

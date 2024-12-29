@@ -2136,7 +2136,7 @@ static void process_touch_command(conn *c, token_t *tokens, const size_t ntokens
     }
 }
 
-static void process_arithmetic_command(conn *c, token_t *tokens, const size_t ntokens, const uint64_t type) {
+static void process_arithmetic_command(conn *c, token_t *tokens, const size_t ntokens, enum arithmetic_command command) {
     char temp[INCR_MAX_STORAGE_LEN];
     uint64_t delta;
     char *key;
@@ -2159,7 +2159,7 @@ static void process_arithmetic_command(conn *c, token_t *tokens, const size_t nt
         return;
     }
 
-    switch(add_delta(c->thread, key, nkey, type, delta, temp, NULL)) {
+    switch(add_delta(c->thread, key, nkey, command, delta, temp, NULL)) {
     case OK:
         out_string(c, temp);
         break;
@@ -2171,11 +2171,12 @@ static void process_arithmetic_command(conn *c, token_t *tokens, const size_t nt
         break;
     case DELTA_ITEM_NOT_FOUND:
         pthread_mutex_lock(&c->thread->stats.mutex);
-        if (type == 0) {
+        if (command == ARITHMETIC_INCR) {
             c->thread->stats.incr_misses++;
         } else {
             c->thread->stats.decr_misses++;
         }
+        // TODO: Mult stats
         pthread_mutex_unlock(&c->thread->stats.mutex);
 
         out_string(c, "NOT_FOUND");
