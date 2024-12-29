@@ -67,5 +67,5 @@ print $sock "set text 0 0 2\r\nhi\r\n";
 is(scalar <$sock>, "STORED\r\n", "stored hi");
 print $sock "incr text 1\r\n";
 is(scalar <$sock>,
-   "CLIENT_ERROR cannot increment or decrement non-numeric value\r\n",
+   "CLIENT_ERROR cannot increment, decrement, or multiply non-numeric value\r\n",
    "hi - 1 = 0");
